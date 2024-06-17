@@ -1,7 +1,7 @@
 <details>
   <summary>TP4056 Lithium-Ion Battery Charger IC</summary>
   
-  ![TP4056](Hardware/Images/TP4056_IC.png)
+  ![TP4056](https://github.com/YieldingData/PowerPack/blob/2fea95f8d5ccdef312318f33c677c3c6dba8a4c7/Hardware/Images/TP4056_IC.png)
 
   The TP4056 is an integrated circuit designed for charging single-cell lithium-ion or lithium polymer batteries. It is widely used in various electronic applications where rechargeable batteries require safe and efficient charging.
 
