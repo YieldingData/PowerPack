@@ -21,6 +21,7 @@
   <summary>MT3608 step-up (boost) DC-DC converter IC</summary>
 
 ### MT3608 Summary
+![TP4056](https://github.com/YieldingData/PowerPack/blob/05abd47fd09f162be14a1ae910c01269733a78c9/Hardware/Images/MT3608.jpg)
 
 **MT3608** is a step-up (boost) DC-DC converter IC commonly used in electronic circuits to increase voltage levels efficiently. It operates with a wide input voltage range (2V to 24V) and can output up to 28V. Key features include:
 
