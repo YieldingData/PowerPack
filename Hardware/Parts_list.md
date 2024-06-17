@@ -16,3 +16,21 @@
 
   The TP4056 IC is valued for its compact size, reliability, and built-in safety features, making it a preferred choice for battery charging solutions.
 </details>
+
+<details>
+  <summary>MT3608 step-up (boost) DC-DC converter IC</summary>
+
+### MT3608 Summary
+
+**MT3608** is a step-up (boost) DC-DC converter IC commonly used in electronic circuits to increase voltage levels efficiently. It operates with a wide input voltage range (2V to 24V) and can output up to 28V. Key features include:
+
+- **High Efficiency**: Achieves high efficiency due to its low resistance internal power MOSFET.
+- **Adjustable Output**: Output voltage can be adjusted via external resistors, offering flexibility in various applications.
+- **Current Protection**: Built-in overcurrent protection helps safeguard the circuit against excessive current.
+- **Compact Size**: Small package size (SOT-23-6 or SOP-8) suitable for space-constrained designs.
+- **Applications**: Commonly used in battery-powered devices, portable electronic gadgets, LED drivers, and other systems requiring boosted voltage from a single-cell battery or other low-voltage sources.
+
+The MT3608 is favored for its simplicity, cost-effectiveness, and robust performance in boosting voltage efficiently across a range of electronic applications.
+
+For more detailed specifications and application notes, refer to the manufacturer's datasheet and technical documentation.
+</details>
