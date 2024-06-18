@@ -2,26 +2,31 @@
 #include <avr/sleep.h>
 #include <avr/power.h>
 
-// Pin definitions
-const int buttonPin = 2;
-const int mosfetPin = 3;
-const int greenLEDPin = 7;
-const int redLEDPin = 8;
-const int batteryPin = A0;
+// Pin definitions for ATmega328P
+const int buttonPin = 2; // PD2, connected to the charge detection circuit
+const int mosfetPin = 3; // PD3
+const int greenLEDPin = 4; // PD4
+const int redLEDPin = 5; // PD5
+const int batteryPin = A1; // PC1
+const int tempPin = A0; // PC0
 
 // Flag and state variables
-volatile bool buttonPressed = false;
-bool powerState = false;
-unsigned long pressTime = 0;
-unsigned long lastMeasureTime = 0;
+volatile bool buttonPressed = false; // Flag to indicate button press
+bool powerState = false; // State of the power (on/off)
+unsigned long pressTime = 0; // Time when button is pressed
+unsigned long lastMeasureTime = 0; // Last time measurements were taken
+bool chargingState = false; // State to track charging
 
 // Timing constants
-const unsigned long longPressDuration = 5000; // 5 seconds
+const unsigned long longPressDuration = 5000; // 5 seconds for long press
+const unsigned long chargingDuration = 10000; // 10 seconds for charging
 const unsigned long measureInterval = 600000; // 10 minutes in milliseconds
-const unsigned long powerOnLEDDuration = 3000; // 3 seconds
-const unsigned long powerOffLEDDuration = 3000; // 3 seconds
-const unsigned long mosfetOffDelay = 12000; // 12 seconds
-const unsigned long debounceDelay = 50; // Debounce delay in milliseconds
+const unsigned long powerOnLEDDuration = 3000; // 3 seconds LED duration on power on
+const unsigned long powerOffLEDDuration = 3000; // 3 seconds LED duration on power off
+const unsigned long mosfetOffDelay = 12000; // 12 seconds delay before MOSFET off
+const unsigned long debounceDelay = 50; // 50 milliseconds debounce delay
+const unsigned long chargingMeasureInterval = 30000; // 30 seconds interval for charging measurements
+const unsigned long fadeDuration = 1000; // 1 second fade duration
 
 const int I2C_ADDR = 8; // I2C address
 
@@ -31,19 +36,27 @@ void setup() {
   pinMode(mosfetPin, OUTPUT);
   pinMode(greenLEDPin, OUTPUT);
   pinMode(redLEDPin, OUTPUT);
-  
+  pinMode(tempPin, INPUT);
+
   // Set initial pin states to LOW
   digitalWrite(mosfetPin, LOW);
   digitalWrite(greenLEDPin, LOW);
   digitalWrite(redLEDPin, LOW);
 
-  // Attach interrupt to button pin
+  // Attach interrupt to button pin (PD2, INT0)
   attachInterrupt(digitalPinToInterrupt(buttonPin), wakeUp, FALLING);
 
   // Initialize I2C communication
-  Wire.begin(I2C_ADDR);
+  Wire.begin();
   Wire.onRequest(requestEvent);
   Wire.onReceive(receiveEvent);
+
+  // Initialize serial communication for debugging
+  Serial.begin(9600);
+
+  // Configure Timer2 for fast PWM on PD4 (greenLEDPin)
+  TCCR2A = _BV(WGM20) | _BV(WGM21) | _BV(COM2B1); // Fast PWM mode, clear OC2B on compare match, set OC2B at bottom
+  TCCR2B = _BV(CS20); // No prescaling
 }
 
 void loop() {
@@ -52,9 +65,16 @@ void loop() {
     handleButtonPress();
   }
 
-  // Measure battery voltage at regular intervals if power is on
-  if (powerState && (millis() - lastMeasureTime > measureInterval)) {
+  // Check charging state and measure battery voltage and temperature every 30 seconds if charging
+  if (chargingState && (millis() - lastMeasureTime >= chargingMeasureInterval)) {
     measureBatteryVoltage();
+    measureBatteryTemperature();
+    lastMeasureTime = millis();
+    indicateCharging();
+  } else if (powerState && (millis() - lastMeasureTime > measureInterval)) {
+    // Measure battery voltage and temperature at regular intervals if power is on
+    measureBatteryVoltage();
+    measureBatteryTemperature();
     lastMeasureTime = millis();
   }
 
@@ -71,18 +91,31 @@ void handleButtonPress() {
   while (digitalRead(buttonPin) == LOW); // Wait for button release
 
   unsigned long pressDuration = millis() - pressTime;
-  
-  if (pressDuration > longPressDuration) {
+
+  Serial.print("Button press duration: ");
+  Serial.println(pressDuration);
+
+  if (pressDuration > longPressDuration && pressDuration <= chargingDuration) {
     togglePowerState();
+  } else if (pressDuration > chargingDuration) {
+    chargingState = true;
+    measureBatteryVoltage();
+    measureBatteryTemperature();
+    lastMeasureTime = millis();
   } else {
     sendSleepSignal();
   }
 
+  delay(debounceDelay); // Ensure button release debounce
   attachInterrupt(digitalPinToInterrupt(buttonPin), wakeUp, FALLING); // Re-attach interrupt
 }
 
 void togglePowerState() {
   powerState = !powerState; // Toggle power state
+  chargingState = false; // Reset charging state when toggling power
+
+  Serial.print("Power state: ");
+  Serial.println(powerState ? "ON" : "OFF");
 
   if (powerState) {
     // Power on sequence
@@ -104,14 +137,24 @@ void togglePowerState() {
 
 void sendShutdownSignal() {
   Wire.beginTransmission(I2C_ADDR);
-  Wire.write('S'); // Send shutdown signal to Pi
-  Wire.endTransmission();
+  if (Wire.write('S') == 1) { // Send shutdown signal
+    Wire.endTransmission();
+    Serial.println("Shutdown signal sent.");
+  } else {
+    Wire.endTransmission();
+    Serial.println("Error sending shutdown signal.");
+  }
 }
 
 void sendSleepSignal() {
   Wire.beginTransmission(I2C_ADDR);
-  Wire.write('L'); // Send sleep signal to Pi
-  Wire.endTransmission();
+  if (Wire.write('L') == 1) { // Send sleep signal
+    Wire.endTransmission();
+    Serial.println("Sleep signal sent.");
+  } else {
+    Wire.endTransmission();
+    Serial.println("Error sending sleep signal.");
+  }
 }
 
 void measureBatteryVoltage() {
@@ -126,15 +169,62 @@ void measureBatteryVoltage() {
 
     // Send battery percentage over I2C
     Wire.beginTransmission(I2C_ADDR);
-    Wire.write('B');
-    Wire.write(batteryPercentage);
+    if (Wire.write('B') == 1 && Wire.write(batteryPercentage) == 1) {
+      Wire.endTransmission();
+      Serial.print("Battery Voltage: ");
+      Serial.print(batteryVoltage);
+      Serial.println(" V");
+      Serial.print("Battery Percentage: ");
+      Serial.println(batteryPercentage);
+    } else {
+      Wire.endTransmission();
+      Serial.println("Error sending battery percentage.");
+    }
+  }
+}
+
+void measureBatteryTemperature() {
+  int tempValue = analogRead(tempPin);
+  float temperatureC = (tempValue * (5.0 / 1023.0) - 0.5) * 100; // Assuming TMP36 sensor
+
+  // Send temperature data over I2C
+  Wire.beginTransmission(I2C_ADDR);
+  if (Wire.write('T') == 1 && Wire.write((int)temperatureC) == 1) {
     Wire.endTransmission();
+    Serial.print("Battery Temperature: ");
+    Serial.print(temperatureC);
+    Serial.println(" °C");
+  } else {
+    Wire.endTransmission();
+    Serial.println("Error sending battery temperature.");
+  }
+}
+
+void indicateCharging() {
+  // Fade in and out the green LED to indicate charging
+  for (int brightness = 0; brightness <= 255; brightness++) {
+    analogWrite(greenLEDPin, brightness);
+    delay(fadeDuration / 255);
+  }
+  for (int brightness = 255; brightness >= 0; brightness--) {
+    analogWrite(greenLEDPin, brightness);
+    delay(fadeDuration / 255);
+  }
+
+  // Send charging state over I2C
+  Wire.beginTransmission(I2C_ADDR);
+  if (Wire.write('C') == 1) { // 'C' indicates charging
+    Wire.endTransmission();
+    Serial.println("Charging state indicated.");
+  } else {
+    Wire.endTransmission();
+    Serial.println("Error indicating charging state.");
   }
 }
 
 void enterSleepMode() {
   // Disable ADC to save power during sleep
-  ADCSRA &= ~(1 << ADEN);
+  power_adc_disable();
   
   set_sleep_mode(SLEEP_MODE_PWR_DOWN);
   sleep_enable();
@@ -144,17 +234,8 @@ void enterSleepMode() {
   sleep_disable();
   
   // Re-enable ADC after waking up
-  ADCSRA |= (1 << ADEN);
+  power_all_enable();
 }
 
 void wakeUp() {
-  buttonPressed = true; // Set flag to indicate button press
-}
-
-void requestEvent() {
-  // Placeholder for handling I2C requests
-}
-
-void receiveEvent(int howMany) {
-  // Placeholder for handling I2C data reception
-}
+  buttonPressed
