@@ -12,6 +12,13 @@ def log_data(data):
 
 def read_i2c():
     try:
+        # Request serial number first
+        bus.write_byte(I2C_ADDR, 0)  # Trigger a request event
+        time.sleep(0.1)
+        serial_data = bus.read_i2c_block_data(I2C_ADDR, 0, 16)  # Adjust size as needed for your serial number
+        serial_number = ''.join(chr(byte) for byte in serial_data).strip()
+
+        # Read actual data
         data = bus.read_i2c_block_data(I2C_ADDR, 0, 2)
         command = chr(data[0])
         value = data[1]
@@ -19,26 +26,26 @@ def read_i2c():
 
         if command == 'B':
             battery_percentage = value
-            log_message = f"{timestamp} - Battery Percentage: {battery_percentage}%"
+            log_message = f"{timestamp} - Serial: {serial_number} - Battery Percentage: {battery_percentage}%"
             print(log_message)
             log_data(log_message)
         elif command == 'S':
-            log_message = f"{timestamp} - Shutdown command received"
+            log_message = f"{timestamp} - Serial: {serial_number} - Shutdown command received"
             print(log_message)
             log_data(log_message)
             # Execute shutdown command
         elif command == 'L':
-            log_message = f"{timestamp} - Sleep command received"
+            log_message = f"{timestamp} - Serial: {serial_number} - Sleep command received"
             print(log_message)
             log_data(log_message)
             # Execute sleep command
         elif command == 'T':
             temperature = value
-            log_message = f"{timestamp} - Battery Temperature: {temperature}°C"
+            log_message = f"{timestamp} - Serial: {serial_number} - Battery Temperature: {temperature}°C"
             print(log_message)
             log_data(log_message)
         elif command == 'C':
-            log_message = f"{timestamp} - Charging"
+            log_message = f"{timestamp} - Serial: {serial_number} - Charging"
             print(log_message)
             log_data(log_message)
     except IOError:
