@@ -72,9 +72,3 @@ PowerPack is an Arduino-based power management system designed for monitoring an
 - **indicateCharging()**: Provides visual feedback for charging.
 - **enterSleepMode()**: Puts the MCU into a low-power sleep mode.
 - **wakeUp()**: Interrupt service routine to wake up the MCU.
-
-## Installation
-
-1. **Clone the repository**:
-   ```sh
-   git clone https://github.com/yourusername/PowerPack.git
