@@ -10,6 +10,11 @@ const int redLEDPin = 5; // PD5
 const int batteryPin = A1; // PC1
 const int tempPin = A0; // PC0
 
+// Battery serial number based on compile date and time
+#define STRINGIFY(x) #x
+#define TOSTRING(x) STRINGIFY(x)
+const char serialNumber[] = "BAT" __DATE__ __TIME__;
+
 // Flag and state variables
 volatile bool buttonPressed = false;
 bool powerState = false;
@@ -218,7 +223,7 @@ void wakeUp() {
 }
 
 void requestEvent() {
-  // Placeholder for handling I2C requests
+  Wire.write(serialNumber); // Send the serial number upon request
 }
 
 void receiveEvent(int howMany) {
