@@ -1,0 +1,163 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>PowerPack Connections</title>
+    <style>
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+        table, th, td {
+            border: 1px solid black;
+        }
+        th, td {
+            padding: 10px;
+            text-align: center;
+        }
+        th {
+            background-color: #f2f2f2;
+        }
+    </style>
+</head>
+<body>
+    <h1>PowerPack Connections</h1>
+    <table>
+        <thead>
+            <tr>
+                <th>Component</th>
+                <th>Pin</th>
+                <th>Connected To</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr>
+                <td>Battery</td>
+                <td>Positive Terminal</td>
+                <td>BAT+ on TP4056</td>
+            </tr>
+            <tr>
+                <td>Battery</td>
+                <td>Negative Terminal</td>
+                <td>BAT- on TP4056</td>
+            </tr>
+            <tr>
+                <td>TP4056</td>
+                <td>BAT+</td>
+                <td>Positive Terminal of Battery</td>
+            </tr>
+            <tr>
+                <td>TP4056</td>
+                <td>BAT-</td>
+                <td>Negative Terminal of Battery</td>
+            </tr>
+            <tr>
+                <td>TP4056</td>
+                <td>OUT+</td>
+                <td>Input of Buck Converter</td>
+            </tr>
+            <tr>
+                <td>TP4056</td>
+                <td>OUT-</td>
+                <td>GND</td>
+            </tr>
+            <tr>
+                <td>Buck Converter</td>
+                <td>Input</td>
+                <td>OUT+ and OUT- of TP4056</td>
+            </tr>
+            <tr>
+                <td>Buck Converter</td>
+                <td>Output</td>
+                <td>5V Rail (VCC)</td>
+            </tr>
+            <tr>
+                <td>ATmega328P</td>
+                <td>VCC</td>
+                <td>5V Rail (from Buck Converter)</td>
+            </tr>
+            <tr>
+                <td>ATmega328P</td>
+                <td>GND</td>
+                <td>Common Ground (GND)</td>
+            </tr>
+            <tr>
+                <td>Push Button</td>
+                <td>PD2 (INT0)</td>
+                <td>One terminal of Button</td>
+            </tr>
+            <tr>
+                <td>Push Button</td>
+                <td>PD2 (INT0)</td>
+                <td>Other terminal to VCC (5V)</td>
+            </tr>
+            <tr>
+                <td>Push Button</td>
+                <td>PD2 (INT0)</td>
+                <td>10k ohm Pull-Down Resistor to GND</td>
+            </tr>
+            <tr>
+                <td>Green LED</td>
+                <td>PD4</td>
+                <td>Anode through 100 ohm Resistor, Cathode to GND</td>
+            </tr>
+            <tr>
+                <td>Red LED</td>
+                <td>PD5</td>
+                <td>Anode through 150 ohm Resistor, Cathode to GND</td>
+            </tr>
+            <tr>
+                <td>N-Channel MOSFET</td>
+                <td>Gate</td>
+                <td>PD3 through 10k ohm Resistor</td>
+            </tr>
+            <tr>
+                <td>N-Channel MOSFET</td>
+                <td>Source</td>
+                <td>Common Ground (GND)</td>
+            </tr>
+            <tr>
+                <td>N-Channel MOSFET</td>
+                <td>Drain</td>
+                <td>Negative Terminal of SBC Power Input</td>
+            </tr>
+            <tr>
+                <td>Voltage Divider</td>
+                <td>R1 (28.4k ohm)</td>
+                <td>Battery Positive Terminal</td>
+            </tr>
+            <tr>
+                <td>Voltage Divider</td>
+                <td>Junction Point</td>
+                <td>A1 (Analog Input on ATmega328P)</td>
+            </tr>
+            <tr>
+                <td>Voltage Divider</td>
+                <td>R2 (10k ohm)</td>
+                <td>GND</td>
+            </tr>
+            <tr>
+                <td>Thermistor Circuit</td>
+                <td>Thermistor (100k ohm)</td>
+                <td>VCC (5V)</td>
+            </tr>
+            <tr>
+                <td>Thermistor Circuit</td>
+                <td>Junction Point</td>
+                <td>A0 (Analog Input on ATmega328P)</td>
+            </tr>
+            <tr>
+                <td>Thermistor Circuit</td>
+                <td>10k ohm Resistor</td>
+                <td>GND</td>
+            </tr>
+            <tr>
+                <td>Capacitor</td>
+                <td>0.1µF</td>
+                <td>Across A1 (Analog Input) and GND</td>
+            </tr>
+        </tbody>
+    </table>
+</body>
+</html>
