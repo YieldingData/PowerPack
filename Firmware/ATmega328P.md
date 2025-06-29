@@ -1,74 +1,111 @@
-# PowerPack
+# PowerPack (ATmega328P Version)
 
-PowerPack is an Arduino-based power management system designed for monitoring and controlling battery charging and power states. It leverages the ATmega328P microcontroller, with a focus on power efficiency and reliable performance.
+**PowerPack** is an Arduino-based power management system for monitoring battery voltage and temperature, managing power states, and communicating with other devices via I2C. It uses the ATmega328P microcontroller and is optimized for low-power operation in embedded systems and SBC applications.
+
+---
 
 ## Features
 
-- **Button Control**: A single button controls power states and charging operations.
-- **LED Indicators**: Green and red LEDs provide visual feedback for power and charging states.
-- **Battery Monitoring**: Measures battery voltage and temperature at regular intervals.
-- **I2C Communication**: Sends battery status and control signals to other devices.
-- **Power Saving**: Enters a low-power sleep mode to conserve battery when not in active use.
+- **Single Button Control**  
+  One button handles all power and charging state transitions.
 
-## Components
+- **LED Feedback**  
+  Green and red LEDs indicate power, shutdown, and charging status.
 
-- **ATmega328P Microcontroller**
-- **Button**: Connected to PD2 (INT0)
-- **MOSFET**: Controlled by PD3
-- **Green LED**: Connected to PD4
-- **Red LED**: Connected to PD5
-- **Battery Voltage Sensor**: Connected to A1 (PC1)
-- **Temperature Sensor**: Connected to A0 (PC0)
+- **Battery Monitoring**  
+  Reads voltage and temperature at regular intervals.
 
-## Pin Configuration
+- **I2C Communication**  
+  Sends battery status and shutdown/sleep signals to external devices.
 
-| Component         | Pin       |
-|-------------------|-----------|
-| Button            | PD2 (INT0)|
-| MOSFET            | PD3       |
-| Green LED         | PD4       |
-| Red LED           | PD5       |
-| Battery Voltage   | A1 (PC1)  |
-| Temperature Sensor| A0 (PC0)  |
+- **Power Saving**  
+  MCU enters low-power sleep mode when idle, waking only on interrupt.
 
-## Usage
+---
 
-### Button Operations
+## Components & Pin Configuration
 
-- **Short Press**: Sends a sleep signal.
-- **Long Press (5-10 seconds)**: Toggles the power state.
-- **Very Long Press (>10 seconds)**: Initiates charging state.
+| Component           | ATmega328P Pin |
+|---------------------|----------------|
+| **Button**          | PD2 (INT0)     |
+| **MOSFET Control**  | PD3            |
+| **Green LED**       | PD4            |
+| **Red LED**         | PD5            |
+| **Battery Voltage** | A1 (PC1)       |
+| **Temperature**     | A0 (PC0)       |
 
-### Power State
+---
 
-- **On**: Green LED lights up briefly, MOSFET is activated.
-- **Off**: Red LED lights up briefly, then the system powers down.
+## Button Behavior
 
-### Charging State
+| Press Duration      | Action                                |
+|---------------------|----------------------------------------|
+| Short Press         | Send sleep signal over I2C             |
+| Long Press (5–10 s) | Toggle power state (on/off)            |
+| Very Long Press (>10 s) | Enter charging mode               |
 
-- The green LED fades in and out to indicate the charging process.
+---
+
+## Power States
+
+- **Power On**:  
+  Green LED blinks once, MOSFET enables SBC power.
+
+- **Power Off**:  
+  Red LED blinks once, MOSFET disables SBC power, MCU sleeps.
+
+---
+
+## Charging Mode
+
+- When in charging state, the green LED performs a soft pulse (fade in/out).
+- Charging is visual only — actual battery charging is handled externally (e.g., via TP4056).
+
+---
 
 ## Code Overview
 
-### setup()
+### `setup()`
 
-- Initializes pin modes and states.
-- Attaches interrupt to the button pin.
-- Initializes I2C communication and serial debugging.
-- Configures Timer2 for fast PWM on the green LED.
+- Initializes pin modes
+- Attaches interrupt to PD2 (button)
+- Sets up I2C and serial communication
+- Configures Timer2 for PWM (green LED pulsing)
 
-### loop()
+### `loop()`
 
-- Handles button press events.
-- Monitors and updates battery voltage and temperature.
-- Enters sleep mode to conserve power when idle.
+- Monitors button states
+- Measures and updates voltage and temperature
+- Sends relevant I2C messages
+- Enters sleep mode if no activity
 
-### Interrupts and Functions
+### Key Functions
 
-- **handleButtonPress()**: Processes button presses and determines action based on press duration.
-- **togglePowerState()**: Toggles the power state and handles LED indications.
-- **sendShutdownSignal()** and **sendSleepSignal()**: Send control signals via I2C.
-- **measureBatteryVoltage()** and **measureBatteryTemperature()**: Measure and report battery status.
-- **indicateCharging()**: Provides visual feedback for charging.
-- **enterSleepMode()**: Puts the MCU into a low-power sleep mode.
-- **wakeUp()**: Interrupt service routine to wake up the MCU.
+- `handleButtonPress()`: Handles press duration and triggers appropriate state
+- `togglePowerState()`: Toggles SBC power and gives LED feedback
+- `sendShutdownSignal()` / `sendSleepSignal()`: Transmit I2C commands
+- `measureBatteryVoltage()` / `measureBatteryTemperature()`: Analog reads
+- `indicateCharging()`: PWM control for LED pulsing
+- `enterSleepMode()`: Activates low-power mode
+- `wakeUp()`: ISR to resume operation on button press
+
+---
+
+## Notes
+
+- This version assumes the TP4056 or equivalent handles battery charging. PowerPack only provides **visual indication** of charging mode.
+- The I2C address and data format are defined in the firmware header and can be adapted for compatibility with your SBC.
+
+---
+
+## License
+
+This project is licensed under the MIT License. See the [LICENSE](LICENSE) file for details.
+
+---
+
+## Future Improvements
+
+- Add support for monitoring TP4056 CHRG/STDBY pins
+- Add EEPROM support for persistent state
+- Extend compatibility to Xiao ESP32-S3 (see main `README.md`)
