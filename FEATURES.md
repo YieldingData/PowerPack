@@ -56,6 +56,12 @@ Confirmed features are already implemented or tested. Dreamed features are plann
 - QC3.0 or USB-PD 5V/9V/12V negotiation
 - Over-current and over-temperature protection
 - Add support for LiFePO₄ batteries or 2S configurations
+- **Solder-selectable input voltage range**  
+  Add a jumper or solder pad to configure buck converter behavior based on expected input voltage:  
+  - 3–5 V (e.g. single-cell Li-ion)  
+  - 5–24 V (e.g. 2S–5S packs, solar panels)  
+  - 24–60 V (industrial applications, DC rails)  
+  Allows PowerPack to auto-scale or switch buck regulator settings and protection thresholds accordingly.
 
 ### 🔋 Smart Battery Features
 - Fuel gauge integration (e.g., MAX17048, INA219)
@@ -68,14 +74,14 @@ Confirmed features are already implemented or tested. Dreamed features are plann
 - Overvoltage/undervoltage protection for harsh environments
 
 ### 🌐 Advanced Interfaces
-- Wireless control via ESP32 Bluetooth or Wi-Fi
-- OTA firmware updates for ESP32 version
-- Web UI for battery and power stats
+- ~~Wireless control via ESP32 Bluetooth or Wi-Fi~~ ❌  *(Not included)*  
+  To conserve power, PowerPack does not include any always-on wireless interfaces. All communication is handled through I²C by the connected device (e.g. SBC).
+  
+- ~~Wireless control via ESP32 Bluetooth or Wi-Fi~~ ❌ *(Not planned)*  
+  PowerPack avoids always-on radios to preserve battery life. All monitoring is done via I²C, allowing the connected device (e.g. Raspberry Pi) to handle higher-level logic and interfaces.
 
-### 🖥️ UI & Visualization
-- E-paper screen or RGB LED matrix integration
-- Minimal UI for monitoring battery and state without SBC
-- Startup animation or logo screen
+- ~~Web UI for battery and power stats~~ ❌ *(Not needed)*  
+  UI and stats are delegated to the SBC side via I²C integration.
 
 ---
 
