@@ -9,32 +9,33 @@ Confirmed features are already implemented or tested. Dreamed features are plann
 
 ### 🔋 Power Control
 - Long press to power on/off with LED indicators
-- Safe shutdown support via I²C trigger
-- Optional hardware hold pin for SBC shutdown detection
+- Safe shutdown support via I²C command from the SBC
+- Optional hardware hold pin for emergency SBC shutdown detection
 
 ### 📡 Communication
-- I²C protocol for simple 2-wire communication with SBC
-- Python script (`powerpack_monitor.py`) for polling battery stats
-- Compatible with Raspberry Pi, Orange Pi, and similar SBCs
+- I²C protocol for simple 2-wire communication with the host SBC
+- Compatible with Raspberry Pi, Orange Pi, and similar Linux-based boards
+- Python script (`powerpack_monitor.py`) for querying voltage, temperature, and state
 
-### 📈 Battery Monitoring
-- Voltage divider reads battery voltage
-- Converts voltage to estimated battery percentage
-- Optional thermistor for temperature monitoring
+### 📈 Battery & Thermal Monitoring
+- Voltage divider reads battery voltage internally
+- Battery percentage estimated from voltage curve
+- **External thermistor input** for direct battery cell temperature monitoring
+- **Onboard thermistor** for ambient PCB temperature and reference accuracy
 
 ### 🌙 Low Power Operation
-- Deep sleep mode for microcontroller during inactivity
-- Wake on button press or external event
+- Microcontroller enters deep sleep when idle
+- Wake on power button or optional external signal
 - Optimized for long-term battery-powered deployments
 
-### 🧩 Modular Firmware
-- ATmega328P and Xiao ESP32-S3 firmware supported
-- Shared I²C command structure across MCUs
-- Easy to extend to STM32, RP2040, or others
+### 🧩 Modular Firmware Architecture
+- Core firmware developed for **ATTiny1616**
+- Previous support for ATmega328P and Xiao ESP32-S3 (legacy)
+- Shared I²C command protocol allows easy porting to other MCUs (STM32, RP2040, etc.)
 
 ### 🔌 Integrated Charging Support
-- Designed for TP4056 charging module (1S Li-ion)
-- Charge status passthrough (charging/full detection via GPIO)
+- Designed for use with **TP4056** or similar 1S Li-ion charging modules
+- Charge/full status passthrough via GPIO for visual or logic-level indicators
 
 ---
 
