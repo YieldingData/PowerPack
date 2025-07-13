@@ -29,3 +29,10 @@ The system:
 - `smbus` library:
   ```bash
   sudo apt-get install python3-smbus
+  ```
+  Enable I²C support with `sudo raspi-config`.
+
+  Run the example script:
+  ```bash
+  python3 RaspberryPi_script.py
+  ```
