@@ -111,7 +111,7 @@
 ## 📜 License
 
 This project is licensed under the **CERN Open Hardware License v2 – Weakly Reciprocal (CERN-OHL-W)**.  
-See `LICENSE.md` for details.
+See [LICENSE](../LICENSE) for details.
 
 ---
 

@@ -13,21 +13,21 @@
 1. **Connect hardware**  
    Follow the circuit diagram in `/docs/hardware_schematic.png` (coming soon).
 
-2. **Flash firmware**  
-   - [`firmware/esp32s3/`](firmware/esp32s3/) — for Xiao ESP32-S3  
-   - [`firmware/atmega328p/`](firmware/atmega328p/) — for ATmega328P
+2. **Flash firmware**
+   - [`Firmware/esp32s3/`](Firmware/esp32s3/) — for Xiao ESP32-S3
+   - [`Firmware/atmega328p/`](Firmware/atmega328p/) — for ATmega328P
 
-3. **Install software on SBC**  
+3. **Install software on SBC**
    Install required Python dependencies and run:
    ```bash
-   python3 firmware/powerpack_monitor.py
+   python3 Firmware/RaspberryPi_script.py
    ```
 
 ---
 
 ## ✨ Features
 
-See full [FEATURES.md](features.md) for in-depth detail.
+See full [FEATURES.md](FEATURES.md) for in-depth detail.
 
 ### ✅ Confirmed Features
 - **Custom Power Sequences**  
@@ -64,11 +64,11 @@ See full [FEATURES.md](features.md) for in-depth detail.
 ## 📂 Repository Structure
 
 ```
-/hardware/        → KiCad schematic & PCB files
-/firmware/        → Microcontroller firmware
+/Hardware/        → KiCad schematic & PCB files
+/Firmware/        → Microcontroller firmware
 /software/        → SBC I²C communication scripts
 /docs/            → Pinout diagrams, usage docs, feature specs
-features.md       → Full confirmed/dreamed feature list
+FEATURES.md       → Full confirmed/dreamed feature list
 powerpack_v1_spec.md → Electrical & mechanical spec sheet
 README.md         → This file
 ```
@@ -84,5 +84,5 @@ Please submit issues or pull requests to help improve PowerPack.
 
 ## 🛡️ License
 
-Licensed under **CERN-OHL-W v2** (Open Hardware License – Weakly Reciprocal)  
-See [LICENSE.md](LICENSE.md) for more information.
+Licensed under **CERN-OHL-W v2** (Open Hardware License – Weakly Reciprocal)
+See [LICENSE](LICENSE) for more information.
